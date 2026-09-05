@@ -17,7 +17,7 @@ export default function Header() {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-40 h-[60px] flex items-center px-4 lg:px-6
+        className="site-header fixed top-0 left-0 right-0 z-40 h-[60px] flex items-center px-4 lg:px-6
                    border-b border-base bg-surface backdrop-blur-sm"
         style={{
           backgroundColor: "var(--bg-surface)",
@@ -32,7 +32,7 @@ export default function Header() {
                      transition-colors duration-150"
         >
           <span
-            className="flex items-center justify-center w-8 h-8 rounded-lg
+            className="site-logo flex items-center justify-center w-8 h-8 rounded-lg
                            bg-brand-600 text-white shadow-sm"
           >
             <BookOpen size={16} strokeWidth={2.5} />
