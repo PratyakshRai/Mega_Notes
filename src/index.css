@@ -386,3 +386,106 @@
 .animate-slide-in {
   animation: slideInLeft 0.2s ease forwards;
 }
+
+/* ── Reading surface polish ──────────────────────────────────────────────── */
+body {
+  background-image:
+    radial-gradient(
+      circle at 12% 0%,
+      rgba(59, 114, 246, 0.06),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 92% 18%,
+      rgba(34, 197, 154, 0.04),
+      transparent 24%
+    );
+}
+
+header {
+  box-shadow:
+    0 1px 0 rgba(148, 163, 184, 0.04),
+    0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+main > article {
+  margin-inline: auto;
+}
+
+.prose {
+  color: var(--text-base);
+  text-wrap: pretty;
+  animation: fadeIn 0.28s ease both;
+}
+
+.prose h2,
+.prose h3 {
+  color: var(--text-base);
+  letter-spacing: -0.01em;
+}
+
+.prose h2 {
+  padding-top: 0.45rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+
+.prose h2:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.prose strong {
+  color: var(--text-base);
+  font-weight: 700;
+}
+
+.prose a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.prose pre,
+.prose table,
+.prose blockquote,
+.mermaid-container,
+.callout {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.prose pre {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+
+.prose table {
+  background: var(--bg-surface);
+}
+
+.prose th {
+  color: var(--text-base);
+}
+
+[aria-label="Sidebar navigation"],
+[aria-label="Table of contents"] {
+  scrollbar-gutter: stable;
+}
+
+[aria-label="Table of contents"] button {
+  line-height: 1.45;
+}
+
+@media (max-width: 1023px) {
+  main > article {
+    margin-inline: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

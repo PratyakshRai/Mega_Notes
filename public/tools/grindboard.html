@@ -805,6 +805,66 @@
         background: rgba(0, 0, 0, 0.12);
       }
 
+      .all-problems-item {
+        width: calc(100% - 24px);
+        margin: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(119, 212, 194, 0.06);
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+        transition: 0.15s ease;
+      }
+
+      .all-problems-item:hover {
+        border-color: var(--teal);
+        background: rgba(119, 212, 194, 0.12);
+      }
+
+      .all-problems-item.active {
+        border-color: var(--accent-dim);
+        background: var(--accent-glow);
+        box-shadow: inset 3px 0 var(--accent);
+      }
+
+      .all-problems-icon {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border-radius: 9px;
+        background: var(--teal-dim);
+        color: var(--teal);
+        font-size: 15px;
+      }
+
+      .all-problems-copy {
+        display: grid;
+        flex: 1;
+        gap: 3px;
+        min-width: 0;
+      }
+
+      .all-problems-copy strong {
+        font-size: 12px;
+        font-weight: 650;
+      }
+
+      .all-problems-copy small {
+        color: var(--text-faint);
+        font-size: 10px;
+      }
+
+      .all-problems-count {
+        color: var(--accent);
+        font-size: 10px;
+      }
+
       .gs-value.accent {
         color: var(--accent);
       }
@@ -16516,7 +16576,21 @@
               key: p.key,
               name: p.name,
               difficulty: p.difficulty,
+              popularity: p.popularity,
             };
+          } else {
+            if (
+              DIFF_ORDER[p.difficulty] >
+              DIFF_ORDER[ALL_PROBLEMS[p.key].difficulty]
+            ) {
+              ALL_PROBLEMS[p.key].difficulty = p.difficulty;
+            }
+            if (
+              POP_ORDER[p.popularity] <
+              POP_ORDER[ALL_PROBLEMS[p.key].popularity]
+            ) {
+              ALL_PROBLEMS[p.key].popularity = p.popularity;
+            }
           }
         });
       });
@@ -16606,6 +16680,7 @@
         const [solved, setSolved] = useState({}); // key -> true
         const [loaded, setLoaded] = useState(false);
         const [activeCompany, setActiveCompany] = useState(COMPANY_NAMES[0]);
+        const [showAllProblems, setShowAllProblems] = useState(false);
         const [sidebarSearch, setSidebarSearch] = useState("");
         const [search, setSearch] = useState("");
         const [difficultyFilter, setDifficultyFilter] = useState("All");
@@ -16729,7 +16804,9 @@
           return COMPANY_NAMES.filter((c) => c.toLowerCase().includes(q));
         }, [sidebarSearch]);
 
-        const companyProblems = COMPANY_DATA[activeCompany] || [];
+        const companyProblems = showAllProblems
+          ? Object.values(ALL_PROBLEMS)
+          : COMPANY_DATA[activeCompany] || [];
 
         const companySolvedCount = useMemo(() => {
           return companyProblems.filter((p) => solved[p.key]).length;
@@ -16861,6 +16938,24 @@
                 </div>
               </div>
 
+              <button
+                type="button"
+                className={
+                  "all-problems-item" + (showAllProblems ? " active" : "")
+                }
+                onClick={() => setShowAllProblems(true)}
+                aria-pressed={showAllProblems}
+              >
+                <span className="all-problems-icon">✦</span>
+                <span className="all-problems-copy">
+                  <strong>All questions</strong>
+                  <small>Every distinct problem once</small>
+                </span>
+                <span className="all-problems-count mono">
+                  {solvedCount}/{TOTAL_DISTINCT}
+                </span>
+              </button>
+
               <div className="sidebar-search">
                 <input
                   placeholder="Filter companies…"
@@ -16884,10 +16979,16 @@
                       key={c}
                       type="button"
                       className={
-                        "company-item" + (c === activeCompany ? " active" : "")
+                        "company-item" +
+                        (!showAllProblems && c === activeCompany
+                          ? " active"
+                          : "")
                       }
-                      onClick={() => setActiveCompany(c)}
-                      aria-pressed={c === activeCompany}
+                      onClick={() => {
+                        setActiveCompany(c);
+                        setShowAllProblems(false);
+                      }}
+                      aria-pressed={!showAllProblems && c === activeCompany}
                     >
                       <div className="company-ring">
                         <CircleRing
@@ -16913,8 +17014,12 @@
               <div className="main-header">
                 <div className="mh-top">
                   <div className="mh-titlewrap">
-                    <div className="mh-eyebrow mono">COMPANY</div>
-                    <div className="mh-title">{activeCompany}</div>
+                    <div className="mh-eyebrow mono">
+                      {showAllProblems ? "DISTINCT QUESTION BANK" : "COMPANY"}
+                    </div>
+                    <div className="mh-title">
+                      {showAllProblems ? "All questions" : activeCompany}
+                    </div>
                   </div>
                   <div className="mh-progress-block">
                     <div className="mh-progress-nums">
