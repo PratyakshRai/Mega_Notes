@@ -51,7 +51,7 @@ export default function NotePage() {
 
       <article
         ref={contentRef as React.RefObject<HTMLElement>}
-        className="px-4 sm:px-8 lg:px-12 py-10 max-w-[780px]"
+        className="px-4 sm:px-8 lg:px-12 py-10 max-w-[940px]"
         aria-labelledby="note-title"
       >
         <div

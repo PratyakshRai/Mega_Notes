@@ -5,37 +5,45 @@
 // Adding a new content/category/topic/index.md requires ZERO React changes.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { parseFrontmatter } from './frontmatter';
-import type { Note, NoteMetadata, NavCategory, NavTree, NoteFrontmatter } from '@/types';
-import { slugToLabel } from './utils';
+import { parseFrontmatter } from "./frontmatter";
+import type {
+  Note,
+  NoteMetadata,
+  NavCategory,
+  NavTree,
+  NoteFrontmatter,
+} from "@/types";
+import { slugToLabel } from "./utils";
 
 // ── Category display order ────────────────────────────────────────────────────
 const CATEGORY_ORDER: Record<string, number> = {
-  'dsa':               0,
-  'backend':           1,
-  'frontend':          2,
-  'databases':         3,
-  'operating-systems': 4,
-  'computer-networks': 5,
-  'system-design':     6,
+  dsa: 0,
+  backend: 1,
+  "backend-supplement": 2,
+  frontend: 3,
+  databases: 4,
+  "operating-systems": 5,
+  "computer-networks": 6,
+  "system-design": 7,
 };
 
 // ── Category display labels (override auto-slugged labels) ────────────────────
 const CATEGORY_LABELS: Record<string, string> = {
-  'dsa':               'DSA',
-  'backend':           'Backend',
-  'frontend':          'Frontend',
-  'databases':         'Databases',
-  'operating-systems': 'Operating Systems',
-  'computer-networks': 'Computer Networks',
-  'system-design':     'System Design',
+  dsa: "DSA",
+  backend: "Backend",
+  "backend-supplement": "Backend Supplement",
+  frontend: "Frontend",
+  databases: "Databases",
+  "operating-systems": "Operating Systems",
+  "computer-networks": "Computer Networks",
+  "system-design": "System Design",
 };
 
 // ── Raw Markdown glob ─────────────────────────────────────────────────────────
 // Vite resolves this at build time — all Markdown files become eager imports.
-const rawFiles = import.meta.glob('/content/**/*.md', {
-  query: '?raw',
-  import: 'default',
+const rawFiles = import.meta.glob("/content/**/*.md", {
+  query: "?raw",
+  import: "default",
   eager: true,
 }) as Record<string, string>;
 
@@ -45,11 +53,11 @@ function parseNotes(): Note[] {
 
   for (const [filePath, rawContent] of Object.entries(rawFiles)) {
     // filePath example: "/content/backend/rest-api/index.md"
-    const parts = filePath.replace(/^\/content\//, '').split('/');
+    const parts = filePath.replace(/^\/content\//, "").split("/");
     if (parts.length < 2) continue;
 
     const categorySlug = parts[0];
-    const topicSlug    = parts[1];
+    const topicSlug = parts[1];
 
     if (!categorySlug || !topicSlug) continue;
 
@@ -77,7 +85,7 @@ function parseNotes(): Note[] {
 
     notes.push({
       ...fm,
-      tags:         fm.tags ?? [],
+      tags: fm.tags ?? [],
       categorySlug,
       topicSlug,
       path,
@@ -104,9 +112,12 @@ export function getAllNotes(): NoteMetadata[] {
 }
 
 /** Return a single note (with content) by category + topic slug */
-export function getNoteBySlug(categorySlug: string, topicSlug: string): Note | undefined {
+export function getNoteBySlug(
+  categorySlug: string,
+  topicSlug: string,
+): Note | undefined {
   return getNotes().find(
-    (n) => n.categorySlug === categorySlug && n.topicSlug === topicSlug
+    (n) => n.categorySlug === categorySlug && n.topicSlug === topicSlug,
   );
 }
 
@@ -120,10 +131,10 @@ export function getNavTree(): NavTree {
 
     if (!categoryMap.has(categorySlug)) {
       categoryMap.set(categorySlug, {
-        label:       CATEGORY_LABELS[categorySlug] ?? slugToLabel(categorySlug),
+        label: CATEGORY_LABELS[categorySlug] ?? slugToLabel(categorySlug),
         categorySlug,
-        topics:      [],
-        order:       CATEGORY_ORDER[categorySlug] ?? 99,
+        topics: [],
+        order: CATEGORY_ORDER[categorySlug] ?? 99,
       });
     }
 
@@ -131,17 +142,19 @@ export function getNavTree(): NavTree {
     // Avoid duplicates (shouldn't happen, but be safe)
     if (!cat.topics.find((t) => t.topicSlug === topicSlug)) {
       cat.topics.push({
-        label:     title,
+        label: title,
         topicSlug,
         path,
-        order:     note.order ?? 999,
+        order: note.order ?? 999,
       });
     }
   }
 
   // Sort topics within each category by order, then alphabetically
   for (const cat of categoryMap.values()) {
-    cat.topics.sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+    cat.topics.sort(
+      (a, b) => a.order - b.order || a.label.localeCompare(b.label),
+    );
   }
 
   // Sort categories by order
@@ -166,11 +179,17 @@ export function getRelatedNotes(note: NoteMetadata, limit = 5): NoteMetadata[] {
 }
 
 /** Get prev/next notes within the same category (ordered) */
-export function getPrevNext(note: NoteMetadata): { prev?: NoteMetadata; next?: NoteMetadata } {
+export function getPrevNext(note: NoteMetadata): {
+  prev?: NoteMetadata;
+  next?: NoteMetadata;
+} {
   const all = getAllNotes();
   const inCategory = all
     .filter((n) => n.categorySlug === note.categorySlug)
-    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || a.title.localeCompare(b.title));
+    .sort(
+      (a, b) =>
+        (a.order ?? 999) - (b.order ?? 999) || a.title.localeCompare(b.title),
+    );
 
   const idx = inCategory.findIndex((n) => n.topicSlug === note.topicSlug);
   return {
