@@ -17,26 +17,12 @@ import { slugToLabel } from "./utils";
 
 // ── Category display order ────────────────────────────────────────────────────
 const CATEGORY_ORDER: Record<string, number> = {
-  dsa: 0,
-  backend: 1,
-  "backend-supplement": 2,
-  frontend: 3,
-  databases: 4,
-  "operating-systems": 5,
-  "computer-networks": 6,
-  "system-design": 7,
+  backend: 0,
 };
 
 // ── Category display labels (override auto-slugged labels) ────────────────────
 const CATEGORY_LABELS: Record<string, string> = {
-  dsa: "DSA",
   backend: "Backend",
-  "backend-supplement": "Backend Supplement",
-  frontend: "Frontend",
-  databases: "Databases",
-  "operating-systems": "Operating Systems",
-  "computer-networks": "Computer Networks",
-  "system-design": "System Design",
 };
 
 // ── Raw Markdown glob ─────────────────────────────────────────────────────────
@@ -52,12 +38,19 @@ function parseNotes(): Note[] {
   const notes: Note[] = [];
 
   for (const [filePath, rawContent] of Object.entries(rawFiles)) {
-    // filePath example: "/content/backend/rest-api/index.md"
+    // Supports both /content/backend/topic/index.md and
+    // /content/backend/youtube/By Sriniously/topic/index.md.
     const parts = filePath.replace(/^\/content\//, "").split("/");
-    if (parts.length < 2) continue;
+    const folders = parts.slice(0, -1);
+    if (folders.length < 2) continue;
 
-    const categorySlug = parts[0];
-    const topicSlug = parts[1];
+    const categorySlug = folders[0];
+    const topicSlug = folders[folders.length - 1];
+    const groupPath =
+      folders
+        .slice(1, -1)
+        .map((folder) => slugToLabel(folder))
+        .join(" / ") || undefined;
 
     if (!categorySlug || !topicSlug) continue;
 
@@ -88,6 +81,7 @@ function parseNotes(): Note[] {
       tags: fm.tags ?? [],
       categorySlug,
       topicSlug,
+      groupPath,
       path,
       content: parsed.content,
     });
@@ -127,7 +121,7 @@ export function getNavTree(): NavTree {
   const categoryMap = new Map<string, NavCategory>();
 
   for (const note of notes) {
-    const { categorySlug, topicSlug, title, path } = note;
+    const { categorySlug, topicSlug, title, path, groupPath } = note;
 
     if (!categoryMap.has(categorySlug)) {
       categoryMap.set(categorySlug, {
@@ -146,6 +140,7 @@ export function getNavTree(): NavTree {
         topicSlug,
         path,
         order: note.order ?? 999,
+        groupPath,
       });
     }
   }

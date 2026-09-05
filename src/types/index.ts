@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Difficulty level of a note */
-export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced';
+export type Difficulty = "Beginner" | "Intermediate" | "Advanced";
 
 /** Source metadata (optional — only when user provides it) */
 export interface NoteSource {
@@ -20,8 +20,8 @@ export interface NoteFrontmatter {
   tags?: string[];
   description?: string;
   source?: NoteSource;
-  order?: number;        // optional ordering within a category
-  date?: string;         // ISO date string for "recently added"
+  order?: number; // optional ordering within a category
+  date?: string; // ISO date string for "recently added"
 }
 
 /** A fully resolved note with slug info */
@@ -30,6 +30,8 @@ export interface NoteMetadata extends NoteFrontmatter {
   categorySlug: string;
   /** e.g. "rest-api" */
   topicSlug: string;
+  /** Folder path between the category and topic, e.g. "YouTube / By Sriniously" */
+  groupPath?: string;
   /** Full URL path: "/backend/rest-api" */
   path: string;
 }
@@ -45,6 +47,7 @@ export interface NavTopic {
   topicSlug: string;
   path: string;
   order: number;
+  groupPath?: string;
 }
 
 /** A category grouping in the sidebar */
